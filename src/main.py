@@ -13,4 +13,4 @@ train_loader, test_loader  = dataload.load_dataset( 'Caltech101', 1000, max_num 
 import train 
 model = train.load_model(False,10,102, 'vit_b_16')
 print(model)
-train.Train_Model(model, train_loader,test_loader,False,epochs=1)
+train.Train_Model(model, train_loader,test_loader,False,epochs=1000)
