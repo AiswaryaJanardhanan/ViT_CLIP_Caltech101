@@ -98,7 +98,7 @@ def load_dataset( dataset, cluster=1000, max_num = None):
       oldPath = root_dir +'/caltech101/101_ObjectCategories'
       classes = os.listdir(oldPath)
     
-      if not os.listdir(root=root_dir +'/caltech101/train'):
+      if not os.listdir(root_dir +'/caltech101/train'):
         train_test_validation_Split(oldPath, newpath, classes)
 
       data = {
