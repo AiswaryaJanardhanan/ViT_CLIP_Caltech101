@@ -77,7 +77,7 @@ def layerFreezing(model,layerid,NUM_CLASSES, model_name='vit_b_16', pretrained=T
 							  nn.Linear(768, 512),
 							  nn.ReLU(),
 							  nn.Dropout(0.5),
-							  nn.Linear(512, 102),)		
+							  nn.Linear(512, 101),)		
 	return model
 
 #Test Function

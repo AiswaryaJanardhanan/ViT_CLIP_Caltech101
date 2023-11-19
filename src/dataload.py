@@ -112,8 +112,8 @@ def load_dataset( dataset, cluster=1000, max_num = None):
       validation_data= data['validation']
       test_set = data['test']
       
-    train_loader = DataLoader(train_set, batch_size= 32, shuffle=False, **kwargs)
-    test_loader = DataLoader(test_set, batch_size= 32, shuffle=False, **kwargs)
+    train_loader = DataLoader(train_set, batch_size= 16, shuffle=False, **kwargs)
+    test_loader = DataLoader(test_set, batch_size= 16, shuffle=False, **kwargs)
     return train_loader, test_loader    
 
 
@@ -141,24 +141,26 @@ def list_files(path):
 
 def train_test_validation_Split(oldpath, newpath, classes):
     for name in classes:
-        full_dir = os.path.join(os.getcwd(), f"{oldpath}/{name}")
+        if(name != 'BACKGROUND_Google'):
+            print('class_name',name)
+            full_dir = os.path.join(os.getcwd(), f"{oldpath}/{name}")
 
-        files = list_files(full_dir)
-        total_file = np.size(files,0)
-        # We split data set into 3: train, validation and test
-        
-        train_size = math.ceil(total_file * 3/4) # 75% for training 
+            files = list_files(full_dir)
+            total_file = np.size(files,0)
+            # We split data set into 3: train, validation and test
+            
+            train_size = math.ceil(total_file * 3/4) # 75% for training 
 
-        validation_size = train_size + math.ceil(total_file * 1/8) # 12.5% for validation
-        test_size = validation_size + math.ceil(total_file * 1/8) # 12.5x% for testing 
-        
-        train = files[0:train_size]
-        validation = files[train_size:validation_size]
-        test = files[validation_size:]
+            validation_size = train_size + math.ceil(total_file * 1/8) # 12.5% for validation
+            test_size = validation_size + math.ceil(total_file * 1/8) # 12.5x% for testing 
+            
+            train = files[0:train_size]
+            validation = files[train_size:validation_size]
+            test = files[validation_size:]
 
-        movefiles(train, full_dir,newpath + f"train/{name}")
-        movefiles(validation, full_dir,newpath+ f"validation/{name}")
-        movefiles(test, full_dir,newpath+ f"test/{name}")
+            movefiles(train, full_dir,newpath + f"train/{name}")
+            movefiles(validation, full_dir,newpath+ f"validation/{name}")
+            movefiles(test, full_dir,newpath+ f"test/{name}")
 
 def movefiles(files, old_dir, new_dir):
     new_dir = os.path.join(os.getcwd(), new_dir);
