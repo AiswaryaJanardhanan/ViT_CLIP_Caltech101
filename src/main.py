@@ -30,7 +30,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    pretrained = args.pretarined
+    pretrained = args.pretrained
     epochs=args.epochs
 
     if pretrained ==True:
