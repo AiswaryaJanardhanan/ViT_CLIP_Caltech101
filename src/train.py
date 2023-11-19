@@ -5,7 +5,7 @@ import torch.optim as optim
 from torchvision.models import vit_b_16
 import torch.nn as nn
 import torch.nn.functional as F
-
+import numpy as np
 import dataload
 import os
 import yaml
@@ -15,12 +15,17 @@ with open(config_file, 'r') as stream:
     yamlfile = yaml.safe_load(stream)
     root_dir = yamlfile['root_dir']
     src_dir = yamlfile['src_dir']
+# root_dir = '/content/drive/MyDrive/ECE_562_Project/root'
+# src_dir = '/content/drive/MyDrive/ECE_562_Project/src'
 
 
 # Define the ViT-B-16 model
 def load_model(pretrained,layerid,NUM_CLASSES, model_name):
 	if(model_name == 'vit_b_16'):
-		model = vit_b_16(pretrained = False)
+		if pretrained:
+			model = vit_b_16(weights='DEFAULT')
+		else:
+			model = vit_b_16(weights=None)
 		model=layerFreezing(model,layerid,NUM_CLASSES, model_name, pretrained)
 		return model
 
@@ -122,16 +127,16 @@ def train(model, train_loader, optimizer, epoch):
 
 ##training model and saving checkpoint 
 def Train_Model(model, train_loader,test_loader,pretrained, epochs):
-	layerID = 7
+	layerID = 0
 	torch.cuda.empty_cache()
 	cluster = len(train_loader.dataset)
 	description= ''
 	if pretrained ==False:
 		description+='vitb16_trSize_' + str(cluster)
 	else:
+		layerID =7
 		description+='vitb16_LayerID_'+str(layerID)
 	save_path= root_dir +'/model/'+	description
-
 	if not os.path.exists(save_path+'_Epoch_'+str(epochs)):
 		print('***'*10,'Saving model to: ', save_path+'_Epoch_'+str(epochs))
 		model.train()

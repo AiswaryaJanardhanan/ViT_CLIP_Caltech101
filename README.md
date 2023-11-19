@@ -13,16 +13,15 @@ We will compare the performace of various models like VGG-16, ResNet-18, ViT (sw
 
 ## Setting up the directory
 Set src and root dir in env.yml
-Set src_dir in EE_562_project.ipynb
-
+Set all arguments in main.py as needed
 ## Data preprocessing
-75% of our data goes for training, 12.5% for validation, and 12.5% for testing. We will use the dataload.py to load the dataset and apply the transformations to the dataset.
+80% of our data goes for training, 5% for validation, and 15% for testing. We will use the dataload.py to load the dataset and apply the transformations to the dataset.
 
 ## Dataset Acquisition: 
 Loading and pre-processing the data from pytorch, splitting it into train, validation and test sets. Applying transformations to the data to augment the dataset. Data augmentation techniques involve artificially modifying existing data samples to create new ones, effectively increasing the size and diversity of the training dataset. The goal is to improve the generalization ability of the machine learning model by exposing it to a wider range of data variations.
 
 ## Training and Testing
-You can run cells one after the other in EE_562_project.ipynb
+You can run cells one after the other in EE_562_project.ipynb or run the main.py file. The
 train.py has the main training and test functions, path name for checkpoint and model name can be set in the train.py file.
 
 ## root_dir has model folder where the checkpoints are saved
