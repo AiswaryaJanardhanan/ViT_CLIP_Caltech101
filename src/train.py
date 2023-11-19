@@ -122,7 +122,7 @@ def train(model, train_loader, optimizer, epoch):
 
 ##training model and saving checkpoint 
 def Train_Model(model, train_loader,test_loader,pretrained, epochs):
-	layerID = 10
+	layerID = 7
 	torch.cuda.empty_cache()
 	cluster = len(train_loader.dataset)
 	description= ''
@@ -136,7 +136,7 @@ def Train_Model(model, train_loader,test_loader,pretrained, epochs):
 		print('***'*10,'Saving model to: ', save_path+'_Epoch_'+str(epochs))
 		model.train()
 		model.cuda()
-		optimizer = optim.Adam(model.parameters(), lr=0.001)
+		optimizer = optim.Adam(model.parameters(), lr=0.0001)
 		# optimizer = torch.optim.SGD(model.parameters(), lr=0.01,momentum=0.9, weight_decay=5e-4)
 		for epoch in range(1, epochs + 1):
 			train( model, train_loader, optimizer, epoch)
