@@ -97,8 +97,9 @@ def load_dataset( dataset, cluster=1000, max_num = None):
       newpath =root_dir + '/caltech101/'
       oldPath = root_dir +'/caltech101/101_ObjectCategories'
       classes = os.listdir(oldPath)
-
-      train_test_validation_Split(oldPath, newpath, classes)
+    
+      if not os.listdir(root=root_dir +'/caltech101/train'):
+        train_test_validation_Split(oldPath, newpath, classes)
 
       data = {
           'train': datasets.ImageFolder(root=root_dir +'/caltech101/train', transform=image_transforms['train']),
