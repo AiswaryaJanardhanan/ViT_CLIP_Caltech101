@@ -54,7 +54,7 @@ if __name__ == '__main__':
     exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
     model_ft = train.train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, train_loader,dataset_sizes, epochs) 
 
-    cluster = len(dataset_sizes['train'])
+    cluster = dataset_sizes['train']
     delta = {}
 
     save_path = root_dir +'/model/'+ 'vitb16_trSize_' + str(dataset_sizes['train'])
