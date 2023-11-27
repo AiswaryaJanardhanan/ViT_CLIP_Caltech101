@@ -6,25 +6,30 @@ import os
 import shutil
 import math
 import yaml
-from utils import mkdir_p
+import zipfile
 
 import torch
-from torch import randperm
 from torchvision import datasets, transforms
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.nn.functional as F
 from torch._utils import _accumulate
 from torch.utils.data import TensorDataset, Subset, DataLoader, ConcatDataset
+
+from zipfile import ZipFile
+
 config_file = '../env.yml'
 with open(config_file, 'r') as stream:
     yamlfile = yaml.safe_load(stream)
     root_dir = yamlfile['root_dir']
     src_dir = yamlfile['src_dir']
-# root_dir = '/content/drive/MyDrive/ECE_562_Project/root'
-# src_dir = '/content/drive/MyDrive/ECE_562_Project/src'
 
 def load_dataset( dataset, cluster=6902, max_num = None):
+    config_file = '../env.yml'
+    with open(config_file, 'r') as stream:
+        yamlfile = yaml.safe_load(stream)
+        root_dir = yamlfile['root_dir']
+        src_dir = yamlfile['src_dir']
     kwargs = {'num_workers': 2, 'pin_memory': True}
     transform = transforms.Compose([
         transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
@@ -52,7 +57,7 @@ def load_dataset( dataset, cluster=6902, max_num = None):
         
     elif dataset == 'Caltech101':
         print("Loading Caltech101 Dataset")
-        whole_set = datasets.Caltech101(root=root_dir, transform=transform, download = True)
+        whole_set = datasets.Caltech101(root=root_dir, download = True)
         
         
     if dataset != 'Caltech101':
@@ -68,52 +73,88 @@ def load_dataset( dataset, cluster=6902, max_num = None):
           test_set = test_set[:max_num]
     else:
       
-      image_transforms = {
+        im_dimention = 224
+
+        data_transforms = {
             'train': transforms.Compose([
-                      transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
-                      transforms.RandomRotation(degrees=15),
-                      transforms.RandomHorizontalFlip(),
-                      transforms.CenterCrop(size=224),
-                      transforms.ToTensor(),
-                      transforms.Normalize([0.485, 0.456, 0.406],[0.229, 0.224, 0.225])
+                transforms.Resize((244,244)),
+                transforms.RandomRotation(15,),
+                transforms.RandomCrop(im_dimention),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.507, 0.487, 0.441], std=[0.267, 0.256, 0.276])
             ]),
-            'validation': transforms.Compose([
-                    transforms.Resize(size=256),
-                    transforms.CenterCrop(size=224),
-                    transforms.ToTensor(),
-                    transforms.Normalize([0.485, 0.456, 0.406],[0.229, 0.224, 0.225])              
+            'eval': transforms.Compose([
+                transforms.Resize((im_dimention,im_dimention)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.507, 0.487, 0.441], std=[0.267, 0.256, 0.276])
             ]),
             'test': transforms.Compose([
-                    transforms.Resize(size=256),
-                    transforms.CenterCrop(size=224),
-                    transforms.ToTensor(),
-                    transforms.Normalize([0.485, 0.456, 0.406],[0.229, 0.224, 0.225])              
-            ])
-      }
+                transforms.Resize((im_dimention,im_dimention)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.507, 0.487, 0.441], std=[0.267, 0.256, 0.276])
+            ]),
+        }
 
-      newpath =root_dir + '/caltech101/'
-      oldPath = root_dir +'/caltech101/101_ObjectCategories'
-      classes = os.listdir(oldPath)
-      if not os.path.isdir(root_dir + '/caltech101/train'):
-          train_test_validation_Split(oldPath, newpath, classes)
-      elif not os.listdir(root_dir +'/caltech101/train'):
-          train_test_validation_Split(oldPath, newpath, classes)
+        newpath =root_dir + '/data/'
+        oldPath = root_dir +'/caltech101/101_ObjectCategories'
+        classes = os.listdir(oldPath)
+        if not os.path.isdir(newpath +'train'):
+            train_test_validation_Split(oldPath, newpath, classes)
+        elif not os.listdir(newpath +'train'):
+            train_test_validation_Split(oldPath, newpath, classes)
 
-      data = {
-          'train': datasets.ImageFolder(root=root_dir +'/caltech101/train', transform=image_transforms['train']),
-          'validation': datasets.ImageFolder(root=root_dir+'/caltech101/validation',transform=image_transforms['validation']),
-          'test': datasets.ImageFolder(root=root_dir+'/caltech101/test', transform=image_transforms['test'])
-      }
-      
-      transform=image_transforms['train']
-      train_set = data['train']
-      validation_data= data['validation']
-      test_set = data['test']
-      
-    train_loader = DataLoader(train_set, batch_size= 16, shuffle=False, **kwargs)
-    test_loader = DataLoader(test_set, batch_size= 16, shuffle=False, **kwargs)
-    return train_loader, test_loader    
+        count = 0
+        for root_dir, cur_dir, files in os.walk(newpath+'train/'):
+            count += len(files)
+        print('Train image count without Background Class:', count)
 
+        for iterf in ['train/', 'eval/']:
+            create_dir(newpath + iterf + 'zzzBackground') 
+
+        create_dir(newpath +'Background')
+        with zipfile.ZipFile(newpath+'Background_data.zip', 'r') as zip_ref:
+            zip_ref.extractall(newpath + 'Background/')
+
+        image_index = 0
+        for dirpath, dirnames, filenames in os.walk(newpath +'Background/'):
+            for fname in filenames:
+                if image_index == 2000: 
+                    shutil.copyfile(path, newpath + 'eval/'+'zzzBackground'+'/'+str(image_index) + fname[-9:])
+                    #break 
+                path = os.path.join(dirpath,fname)
+                shutil.copyfile(path, newpath + 'train/'+'zzzBackground'+'/'+str(image_index) + fname[-9:])
+                image_index = image_index +1
+        count = 0
+
+        for root_dir, cur_dir, files in os.walk(newpath+'train/'):
+            count += len(files)
+        print('Image count with Background Class:', count)      
+
+        
+
+    
+    if(dataset == 'Caltech101'):
+        data = {x: datasets.ImageFolder(os.path.join(newpath, x),
+                                        data_transforms[x])
+                for x in ['train', 'eval','test']}
+        dataset_sizes = {x: len(data[x]) for x in ['train', 'eval']}
+        class_names = data['train'].classes
+
+        train_loader = {x: torch.utils.data.DataLoader(data[x], batch_size=16,
+                                            shuffle=True, num_workers=0)
+            for x in ['train', 'eval']}
+
+        test_loader = {'test': torch.utils.data.DataLoader(data['test'], batch_size=16,
+                                            shuffle=False, num_workers=0)}
+    else:
+        train_loader = DataLoader(train_set, batch_size= 16, shuffle=False, **kwargs)
+        test_loader = DataLoader(test_set, batch_size= 16, shuffle=False, **kwargs)
+    return train_loader, test_loader, dataset_sizes, class_names 
+
+def create_dir(folderlocation):
+    if not os.path.exists(folderlocation):
+        os.mkdir(folderlocation)
 
 def dataset_split(dataset, lengths,seed=1):
     """
@@ -140,26 +181,27 @@ def list_files(path):
 def train_test_validation_Split(oldpath, newpath, classes):
     for name in classes:
         if(name != 'BACKGROUND_Google'):
+            print('class_name',name)
             full_dir = os.path.join(os.getcwd(), f"{oldpath}/{name}")
 
             files = list_files(full_dir)
             total_file = np.size(files,0)
             # We split data set into 3: train, validation and test
             
-            train_size = math.ceil(total_file * 8/10) # 80% for training 
+            train_size = math.ceil(total_file * 71/100) # 71% for training 
 
-            validation_size = train_size + math.ceil(total_file * 1/20) # 5% for validation
-            test_size = validation_size + math.ceil(total_file * 3/20) # 15% for testing 
+            validation_size = train_size + math.ceil(total_file * 9/100) # 9% for validation
+            test_size = validation_size + math.ceil(total_file * 20/100) # 20% for testing 
             
             train = files[0:train_size]
             validation = files[train_size:validation_size]
             test = files[validation_size:]
-
             movefiles(train, full_dir,newpath + f"train/{name}")
-            movefiles(validation, full_dir,newpath+ f"validation/{name}")
+            movefiles(validation, full_dir,newpath+ f"eval/{name}")
             movefiles(test, full_dir,newpath+ f"test/{name}")
 
-def movefiles(files, old_dir, new_dir):
+def movefiles(files, old_dir, new_dir):    
+
     new_dir = os.path.join(os.getcwd(), new_dir)
     if not os.path.exists(new_dir):
         os.makedirs(new_dir)
@@ -168,4 +210,4 @@ def movefiles(files, old_dir, new_dir):
         old_file_path = os.path.join(os.getcwd(), f"{old_dir}/{file}")
         new_file_path = os.path.join(os.getcwd(), f"{new_dir}/{file}")
 
-        shutil.move(old_file_path, new_file_path)
+        shutil.copyfile(old_file_path, new_file_path)

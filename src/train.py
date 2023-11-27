@@ -8,8 +8,7 @@ import torch.nn.functional as F
 import numpy as np
 import dataload
 import os
-import yaml
-from utils import mkdir_p
+import yaml, time, copy
 config_file = '../env.yml'
 with open(config_file, 'r') as stream:
     yamlfile = yaml.safe_load(stream)
@@ -82,77 +81,184 @@ def layerFreezing(model,layerid,NUM_CLASSES, model_name='vit_b_16', pretrained=T
 							  nn.Linear(768, 512),
 							  nn.ReLU(),
 							  nn.Dropout(0.5),
-							  nn.Linear(512, 101),)		
+							  nn.Linear(512, NUM_CLASSES),)		
 	return model
 
-#Test Function
-def test(model, test_loader, verbos=True):
+# #Test Function
+# def test(model, test_loader, verbos=True):
 
-	test_loss = 0
-	correct = 0
-	model.eval()
-	with torch.no_grad():
-		for data, target in test_loader:
-			data, target = data.cuda(), target.cuda()
-			output = model(data)
-			test_loss += F.cross_entropy(output, target).item()
-			pred = output.max(1, keepdim=True)[1]
-			correct += pred.eq(target.view_as(pred)).sum().item()
+# 	test_loss = 0
+# 	correct = 0
+# 	model.eval()
+# 	with torch.no_grad():
+# 		for data, target in test_loader:
+# 			data, target = data.cuda(), target.cuda()
+# 			output = model(data)
+# 			test_loss += F.cross_entropy(output, target).item()
+# 			pred = output.max(1, keepdim=True)[1]
+# 			correct += pred.eq(target.view_as(pred)).sum().item()
 
-	test_loss /= len(test_loader.dataset)
+# 	test_loss /= len(test_loader.dataset)
 
-	accuracy = 100. * correct / len(test_loader.dataset)
-	if verbos:
-		print('\n Test Set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-			test_loss, correct, len(test_loader.dataset), accuracy))
-	return accuracy
+# 	accuracy = 100. * correct / len(test_loader.dataset)
+# 	if verbos:
+# 		print('\n Test Set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+# 			test_loss, correct, len(test_loader.dataset), accuracy))
+# 	return accuracy
 
-##Train function
-def train(model, train_loader, optimizer, epoch):
-  cnt = 0
-  for batch_idx, (data, target) in enumerate(train_loader):
-      data, target = data.cuda(), target.cuda()
-      # print(batch_idx, " - ",f"Data shape: {data.shape}",f"Target shape: {target.shape}")
-      optimizer.zero_grad()
-      output = model(data)
-      loss = F.cross_entropy(output, target)
-      loss.backward()
-      optimizer.step()
-      cnt +=1
-  print('size of training data covered', cnt)
-  acc= test(model,train_loader,verbos=False)
-  print('TargetModel Train Epoch: {} \tLoss: {:.6f}, \t Accuracy: {:.2f}'.format(epoch,loss.item(),acc))
+# ##Train function
+# def train(model, train_loader, optimizer, epoch):
+#   cnt = 0
+#   for batch_idx, (data, target) in enumerate(train_loader):
+#       data, target = data.cuda(), target.cuda()
+#       # print(batch_idx, " - ",f"Data shape: {data.shape}",f"Target shape: {target.shape}")
+#       optimizer.zero_grad()
+#       output = model(data)
+#       loss = F.cross_entropy(output, target)
+#       loss.backward()
+#       optimizer.step()
+#       cnt +=1
+#   print('size of training data covered', cnt)
+#   acc= test(model,train_loader,verbos=False)
+#   print('TargetModel Train Epoch: {} \tLoss: {:.6f}, \t Accuracy: {:.2f}'.format(epoch,loss.item(),acc))
 
-  return acc
+#   return acc
 
 ##training model and saving checkpoint 
-def Train_Model(model, train_loader,test_loader,pretrained, epochs):
-	layerID = 0
-	torch.cuda.empty_cache()
-	cluster = len(train_loader.dataset)
-	description= ''
-	if pretrained ==False:
-		description+='vitb16_trSize_' + str(cluster)
-	else:
-		layerID =7
-		description+='vitb16_LayerID_'+str(layerID)
-	save_path= root_dir +'/model/'+	description
-	if not os.path.exists(save_path+'_Epoch_'+str(epochs)):
-		print('***'*10,'Saving model to: ', save_path+'_Epoch_'+str(epochs))
-		model.train()
-		model.cuda()
-		optimizer = optim.Adam(model.parameters(), lr=0.0001)
-		# optimizer = torch.optim.SGD(model.parameters(), lr=0.01,momentum=0.9, weight_decay=5e-4)
-		for epoch in range(1, epochs + 1):
-			train( model, train_loader, optimizer, epoch)
-			if epoch%100==0:
-				torch.save(model.state_dict(), save_path+'_Epoch_'+str(epoch))
-		torch.save(model.state_dict(), save_path+'_Epoch_'+str(epochs))
-	else:
-		print(save_path+'_Epoch_'+str(epochs))
-		print('***'*10,'Loading model from: ', save_path+'_Epoch_'+str(epochs))
-		model.load_state_dict(torch.load(save_path+'_Epoch_'+str(epochs)))
-		model.cuda()		
-	test(model, test_loader)
+# def Train_Model(model, train_loader,test_loader,pretrained, epochs):
+# 	layerID = 0
+# 	torch.cuda.empty_cache()
+# 	cluster = len(train_loader.dataset)
+# 	description= ''
+# 	if pretrained ==False:
+# 		description+='vitb16_trSize_' + str(cluster)
+# 	else:
+# 		layerID =7
+# 		description+='vitb16_LayerID_'+str(layerID)
+# 	save_path= root_dir +'/model/'+	description
+# 	if not os.path.exists(save_path+'_Epoch_'+str(epochs)):
+# 		print('***'*10,'Saving model to: ', save_path+'_Epoch_'+str(epochs))
+# 		model.train()
+# 		model.cuda()
+# 		optimizer = optim.Adam(model.parameters(), lr=0.0001)
+# 		# optimizer = torch.optim.SGD(model.parameters(), lr=0.01,momentum=0.9, weight_decay=5e-4)
+# 		for epoch in range(1, epochs + 1):
+# 			train( model, train_loader, optimizer, epoch)
+# 			if epoch%100==0:
+# 				torch.save(model.state_dict(), save_path+'_Epoch_'+str(epoch))
+# 		torch.save(model.state_dict(), save_path+'_Epoch_'+str(epochs))
+# 	else:
+# 		print(save_path+'_Epoch_'+str(epochs))
+# 		print('***'*10,'Loading model from: ', save_path+'_Epoch_'+str(epochs))
+# 		model.load_state_dict(torch.load(save_path+'_Epoch_'+str(epochs)))
+# 		model.cuda()		
+# 	test(model, test_loader)
 
-	return model
+# 	return model
+
+def train_model(model, criterion, optimizer, scheduler,dataloaders,dataset_sizes, num_epochs=25):
+
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    start = time.time()
+
+    bestModel = copy.deepcopy(model.state_dict())
+    bestModelAcc = 0.0
+
+    for epoch in range(num_epochs):
+        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('-' * 10)
+
+        # Each epoch has a training and validation mode
+        for mode in ['train', 'eval']:
+          
+            if mode == 'train':
+				# Set model to training mode
+                model.train()  
+            else:
+				# Set model to evaluate mode
+                model.eval()   
+
+            running_loss = 0.0
+            running_corrects = 0
+
+            # Iterate over data.
+            for inputs, labels in dataloaders[mode]:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+
+                # zero the parameter gradients
+                optimizer.zero_grad()
+                
+                # track history if only in train
+                with torch.set_grad_enabled(mode == 'train'):
+                    outputs = model(inputs)
+                    _, preds = torch.max(outputs, 1)
+                    loss = criterion(outputs, labels)
+
+                    # backward + optimize only if in training mode
+                    if mode == 'train':
+                        loss.backward()
+                        optimizer.step()
+
+                # statistics
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
+            if mode == 'train':
+                scheduler.step()
+
+            crntEpochLoss = running_loss / dataset_sizes[mode]
+            crntEpochAcc = running_corrects.double() / dataset_sizes[mode]
+
+            print('{} Loss: {:.4f} Acc: {:.4f}'.format(
+                mode, crntEpochLoss, crntEpochAcc))
+
+            # deep copy the model
+            if mode == 'eval' and crntEpochAcc > bestModelAcc:
+                bestModelAcc = crntEpochAcc
+                bestModel = copy.deepcopy(model.state_dict())
+        print()
+    end = time.time()
+    time_elapsed = end - start
+    print('Training complete in {:.0f}m {:.0f}s'.format(
+        time_elapsed // 60, time_elapsed % 60))
+    print('Best val Acc: {:4f}'.format(bestModelAcc))
+
+    # load best model weights
+    model.load_state_dict(bestModel)
+
+	#saving model 
+    save_path = root_dir +'/model/'+ 'vitb16_trSize_' + str(dataset_sizes['train'])
+    torch.save(model.load_state_dict(bestModel), save_path+'_Epoch_'+str(num_epochs))
+
+    return model
+
+def test_model(model_ft, dataloaders_test, Num_class, mode = 'test'):
+	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+	y_pred = []
+	y_true = []
+	output_all =[]
+
+	# iterate over test data
+	for inputs, labels in dataloaders_test[mode]:
+			inputs = inputs.to(device)
+			labels = labels.to(device)
+			
+			output = model_ft(inputs) # Feed Network
+			output = output[:,0:Num_class] # Discarding Background Class
+			output = (torch.max(torch.exp(output), 1)[1]).data.cpu().numpy()
+			y_pred.extend(output) # Save Prediction
+			
+			labels = labels.data.cpu().numpy()
+			y_true.extend(labels) # Save Truth
+			
+			
+	test_accuracy = 0
+	for iter1 in range(len(y_true)):
+		if y_true[iter1] == y_pred[iter1]:
+			test_accuracy = test_accuracy + 1
+	acc = test_accuracy/len(y_true)
+	print(mode,'Accuracy:',acc)
+
+	return acc

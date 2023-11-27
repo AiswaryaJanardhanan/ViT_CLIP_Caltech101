@@ -7,13 +7,17 @@ import math
 import shutil
 from torchvision import datasets, transforms
 import yaml
-from utils import mkdir_p
 import argparse
 config_file = '../env.yml'
 with open(config_file, 'r') as stream:
     yamlfile = yaml.safe_load(stream)
     root_dir = yamlfile['root_dir']
     src_dir = yamlfile['src_dir']
+    
+import dataload
+from dataload import *
+import train
+from train import *
 
 if __name__ == '__main__':
 
@@ -21,12 +25,12 @@ if __name__ == '__main__':
 
     parser.add_argument('--dataset_name', default='Caltech101', type=str, help='cifar10, cifar100, gtsrb')
     parser.add_argument('--epochs', type=int, default=500, metavar='N',
-                        help='number of epochs to train (default: 200)')
-    parser.add_argument('--numClasses', type=int, default=101, metavar='N',
-                        help='number of classes(default: 101 in Caltech101)')
+                        help='number of epochs to train (default: 30)')
+    parser.add_argument('--numClasses', type=int, default=102, metavar='N',
+                        help='number of classes(default: 102 in Caltech101 including background)')
 
     parser.add_argument('--modelName',type=str, default='vit_b_16', help = 'vit_b_16,ResNet18,Vgg-16')
-    parser.add_argument('--pretrained', type=str, default=True, help = 'True/ False')
+    parser.add_argument('--pretrained', type=str, default=False, help = 'True/ False')
     args = parser.parse_args()
 
 
@@ -40,20 +44,29 @@ if __name__ == '__main__':
 
     os.chdir(src_dir)
     import dataload
-    train_loader, test_loader  = dataload.load_dataset( args.dataset_name, 6902, max_num = None)
-    import train
-    model = train.load_model(pretrained,layerID,args.numClasses, args.modelName)
-    model = train.Train_Model(model, train_loader,test_loader,pretrained,epochs)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    train_loader, test_loader, dataset_sizes, class_names   = dataload.load_dataset( args.dataset_name, 9000, max_num = None)
+    model_ft = train.load_model(pretrained,layerID,args.numClasses, args.modelName)
+    model_ft = model_ft.to(device)
+    criterion = torch.nn.CrossEntropyLoss()
 
-    cluster = len(train_loader.dataset)
+    optimizer_ft = torch.optim.SGD(model_ft.parameters(), lr=0.0005, momentum=0.9)
+    exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
+    model_ft = train.train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, train_loader,dataset_sizes, epochs) 
+
+    cluster = len(dataset_sizes['train'])
     delta = {}
-    # model.load_state_dict(torch.load(root_dir + '/model/'+'_Epoch_'+str(args.epochs)))
-    # model.cuda()
-    model.eval()
-    acc_test= train.test(model, test_loader, verbos=True)
-    acc_train= train.test(model, train_loader, verbos=True)
+
+    save_path = root_dir +'/model/'+ 'vitb16_trSize_' + str(dataset_sizes['train'])
+    model_eval = train.load_model(pretrained,layerID,args.numClasses, args.modelName)
+    model_eval.load_state_dict(torch.load(save_path + '_Epoch_'+str(args.epochs)))
+    model_eval.eval()
+
+    acc_train= train.test_model(model_eval, train_loader, args.numClasses,'train')
+
+    acc_test= train.test_model(model_eval, test_loader, args.numClasses, 'test')
                         
     delta['acc_test'] = acc_test
     delta['acc_train'] = acc_train
-                            
-    np.save(root_dir + '/results_0.0001'+'_'+'_'+str(layerID)+'_'+str(cluster)+'_'+str(epochs)+'_.npy', delta)
+                           
+    np.save(root_dir + '/results_0.0005'+'_'+'_'+str(layerID)+'_'+str(cluster)+'_'+str(epochs)+'_.npy', delta)
