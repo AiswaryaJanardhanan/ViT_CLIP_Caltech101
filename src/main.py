@@ -57,14 +57,15 @@ if __name__ == '__main__':
     cluster = dataset_sizes['train']
     delta = {}
 
-    save_path = root_dir +'/model/'+ 'vitb16_trSize_' + str(dataset_sizes['train'])
-    model_eval = train.load_model(pretrained,layerID,args.numClasses, args.modelName)
-    model_eval.load_state_dict(torch.load(save_path + '_Epoch_'+str(args.epochs)))
-    model_eval.eval()
+    # save_path = root_dir +'/model/'+ 'vitb16_trSize_' + str(dataset_sizes['train'])
+    # model_eval = train.load_model(pretrained,layerID,args.numClasses, args.modelName)
+    # model_eval.load_state_dict(torch.load(save_path + '_Epoch_'+str(args.epochs)))
+    
+    # model_eval.eval()
 
-    acc_train= train.test_model(model_eval, train_loader, args.numClasses,'train')
+    # acc_train= train.test_model(model_ft, train_loader, args.numClasses,'train')
 
-    acc_test= train.test_model(model_eval, test_loader, args.numClasses, 'test')
+    acc_test= train.test_model(model_ft, test_loader, args.numClasses, 'test')
                         
     delta['acc_test'] = acc_test
     delta['acc_train'] = acc_train
