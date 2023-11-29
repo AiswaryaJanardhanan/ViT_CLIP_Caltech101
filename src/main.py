@@ -57,7 +57,7 @@ if __name__ == '__main__':
     cluster = dataset_sizes['train']
     delta = {}
 
-    # save_path = root_dir +'/model/'+ 'vitb16_trSize_' + str(dataset_sizes['train'])
+    save_path = root_dir +'/model/'+ 'vitb16_trSize_' + str(dataset_sizes['train']) + '_Test.pt'
     # model_eval = train.load_model(pretrained,layerID,args.numClasses, args.modelName)
     # model_eval.load_state_dict(torch.load(save_path + '_Epoch_'+str(args.epochs)))
     
@@ -69,5 +69,5 @@ if __name__ == '__main__':
                         
     delta['acc_test'] = acc_test
     delta['acc_train'] = acc_train
-                           
+    torch.save(model_ft.state_dict(), save_path)                        
     np.save(root_dir + '/results_0.0005'+'_'+'_'+str(layerID)+'_'+str(cluster)+'_'+str(epochs)+'_.npy', delta)
