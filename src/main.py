@@ -68,6 +68,6 @@ if __name__ == '__main__':
     acc_test= train.test_model(model_ft, test_loader, args.numClasses, 'test')
                         
     delta['acc_test'] = acc_test
-    delta['acc_train'] = acc_train
+    # delta['acc_train'] = acc_train
     torch.save(model_ft.state_dict(), save_path)                        
     np.save(root_dir + '/results_0.0005'+'_'+'_'+str(layerID)+'_'+str(cluster)+'_'+str(epochs)+'_.npy', delta)
