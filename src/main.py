@@ -37,7 +37,7 @@ if __name__ == '__main__':
     pretrained = args.pretrained
     epochs=args.epochs
 
-    if pretrained ==True:
+    if pretrained ==False:
         layerID = 0
     else:
         layerID =7
