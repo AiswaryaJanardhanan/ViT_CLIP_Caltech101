@@ -1,6 +1,6 @@
 Loading Caltech101 Dataset
 Files already downloaded and verified
-Train image count without Background Class: 9207
+Train image count without Background Class: 6206
 Image count with Background Class: 9207
 152
 Epoch 0/19
