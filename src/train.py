@@ -28,7 +28,7 @@ def load_model(pretrained,layerid,NUM_CLASSES, model_name):
 		model=layerFreezing(model,layerid,NUM_CLASSES, model_name, pretrained)
 		return model
 
-def layerFreezing(model,layerid,NUM_CLASSES, model_name='vit_b_16', pretrained=True):
+def layerFreezing(model,layerid,NUM_CLASSES, model_name='vit_b_16', pretrained=False):
 
 	
 	"""
