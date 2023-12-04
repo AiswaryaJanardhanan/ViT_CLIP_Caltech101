@@ -39,10 +39,10 @@ if __name__ == '__main__':
     pretrained = args.pretrained
     epochs=args.epochs
 
-    if pretrained ==False:
-        layerID = 0
+    if pretrained:
+        layerID = 7
     else:
-        layerID =7
+        layerID = 0
 
     os.chdir(src_dir)
     import dataload
