@@ -20,7 +20,7 @@ with open(config_file, 'r') as stream:
     root_dir = yamlfile['root_dir']
     src_dir = yamlfile['src_dir']
   
-classes = os.listdir('/content/drive/MyDrive/Caltech101_Vit_Training/trial_data/train/')
+classes = os.listdir(root_dir + '/data/train/')
 
 # Load the model
 device = "cuda" if torch.cuda.is_available() else "cpu"
