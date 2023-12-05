@@ -74,3 +74,4 @@ if __name__ == '__main__':
     # delta['acc_train'] = acc_train
                            
     np.save(root_dir + '/results_0.0005'+'_'+'_'+str(layerID)+'_'+str(cluster)+'_'+str(epochs)+'_.npy', delta)
+    torch.save(model_ft.state_dict(), save_path)
