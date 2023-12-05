@@ -28,9 +28,9 @@ model, preprocess = clip.load('ViT-B/32', device)
 transform = preprocess
 
 data = {
-    'train': datasets.ImageFolder(root=root_dir +'train'),
-    'eval': datasets.ImageFolder(root=root_dir+'eval'),
-    'test': datasets.ImageFolder(root=root_dir+'test')
+    'train': datasets.ImageFolder(root=root_dir +'/data/train'),
+    'eval': datasets.ImageFolder(root=root_dir+'/data/eval'),
+    'test': datasets.ImageFolder(root=root_dir+'/data/test')
 }
 test_set = data['test']
 
