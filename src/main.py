@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--modelName',type=str, default='vit_b_16', help = 'vit_b_16,ResNet18,Vgg-16')
     parser.add_argument('--pretrained', type=bool, default=False, help = 'True/ False')
-    args = parser.parse_args(args=['--dataset_name', 'Caltech101', '--epochs', '20', '--numClasses', '102', '--modelName', 'vit_b_16', '--pretrained', False])
+    args = parser.parse_args(args=['--dataset_name', 'Caltech101', '--epochs', '20', '--numClasses', '102', '--modelName', 'vit_b_16', '--pretrained', 'False'])
 
 
 
