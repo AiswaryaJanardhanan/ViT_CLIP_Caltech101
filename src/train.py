@@ -21,10 +21,12 @@ with open(config_file, 'r') as stream:
 # Define the ViT-B-16 model
 def load_model(pretrained,layerid,NUM_CLASSES, model_name):
 	if(model_name == 'vit_b_16'):
-		if pretrained:
+		if pretrained == True:
+			print('from pretrained')
 			model = vit_b_16(weights='DEFAULT')
 		else:
-			model = vit_b_16(weights=None)
+			print('from scratch')
+			model = vit_b_16(pretrained =False)
 		model=layerFreezing(model,layerid,NUM_CLASSES, model_name, pretrained)
 		return model
 
@@ -38,6 +40,7 @@ def layerFreezing(model,layerid,NUM_CLASSES, model_name='vit_b_16', pretrained=F
 	"""
 	
 	if pretrained == False: 
+		print('from scratch')
 		layerid=0
 		
 	count=0
