@@ -31,17 +31,21 @@ if __name__ == '__main__':
                         help='number of classes(default: 102 in Caltech101 including background)')
 
     parser.add_argument('--modelName',type=str, default='vit_b_16', help = 'vit_b_16,ResNet18,Vgg-16')
-    parser.add_argument('--pretrained', type=bool, default=False, help = 'True/ False')
-    args = parser.parse_args(args=['--dataset_name', 'Caltech101', '--epochs', '20', '--numClasses', '102', '--modelName', 'vit_b_16', '--pretrained', False])
+    parser.add_argument('--pretrained', type=str, default='False', help = 'True/ False')
+    args = parser.parse_args(args=['--dataset_name', 'Caltech101', '--epochs', '500', '--numClasses', '102', '--modelName', 'vit_b_16', '--pretrained', 'False'])
 
 
 
     pretrained = args.pretrained
     epochs=args.epochs
 
-    if pretrained:
+    if pretrained == 'True':
+        print('from pretrained')
+        pretrained = True
         layerID = 7
     else:
+        pretrained = False
+        print('from scratch')
         layerID = 0
 
     os.chdir(src_dir)
@@ -74,3 +78,4 @@ if __name__ == '__main__':
     # delta['acc_train'] = acc_train
                            
     np.save(root_dir + '/results_0.0005'+'_'+'_'+str(layerID)+'_'+str(cluster)+'_'+str(epochs)+'_.npy', delta)
+    torch.save(model_ft.state_dict(), save_path)
