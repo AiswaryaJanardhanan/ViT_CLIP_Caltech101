@@ -24,6 +24,7 @@ with open(config_file, 'r') as stream:
     root_dir = yamlfile['root_dir']
     src_dir = yamlfile['src_dir']
 
+#function to load dataset
 def load_dataset( dataset, cluster=6902, max_num = None):
     config_file = '../env.yml'
     with open(config_file, 'r') as stream:
@@ -31,6 +32,7 @@ def load_dataset( dataset, cluster=6902, max_num = None):
         root_dir = yamlfile['root_dir']
         src_dir = yamlfile['src_dir']
     kwargs = {'num_workers': 2, 'pin_memory': True}
+    #data augmentation for simple datasets like cifar10, gtsrb
     transform = transforms.Compose([
         transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),
         transforms.RandomRotation(degrees=15),
@@ -72,7 +74,7 @@ def load_dataset( dataset, cluster=6902, max_num = None):
           train_set = train_set[:max_num]
           test_set = test_set[:max_num]
     else:
-      
+        #Preprocessing of dataset by applying data augmentation technique      
         im_dimention = 224
 
         data_transforms = {
@@ -99,6 +101,8 @@ def load_dataset( dataset, cluster=6902, max_num = None):
         newpath =root_dir + '/data/'
         oldPath = root_dir +'/caltech101/101_ObjectCategories'
         classes = os.listdir(oldPath)
+        
+        # spliting data into train, val, test set
         if not os.path.isdir(newpath +'train'):
             train_test_validation_Split(oldPath, newpath, classes)
         elif not os.listdir(newpath +'train'):
@@ -109,6 +113,7 @@ def load_dataset( dataset, cluster=6902, max_num = None):
             count += len(files)
         print('Train image count without Background Class:', count)
 
+        # data augmentation by adding background data to train and eval set but not to test set
         for iterf in ['train/', 'eval/']:
             create_dir(newpath + iterf + 'zzzBackground') 
 
@@ -133,7 +138,7 @@ def load_dataset( dataset, cluster=6902, max_num = None):
 
         
 
-    
+    #using dataloader 
     if(dataset == 'Caltech101'):
         data = {x: datasets.ImageFolder(os.path.join(newpath, x),
                                         data_transforms[x])
@@ -178,6 +183,7 @@ def list_files(path):
     files = os.listdir(path)
     return np.asarray(files)
 
+# function to split whole dataset into train, test or eval data 
 def train_test_validation_Split(oldpath, newpath, classes):
     for name in classes:
         if(name != 'BACKGROUND_Google'):
@@ -199,7 +205,8 @@ def train_test_validation_Split(oldpath, newpath, classes):
             movefiles(train, full_dir,newpath + f"train/{name}")
             movefiles(validation, full_dir,newpath+ f"eval/{name}")
             movefiles(test, full_dir,newpath+ f"test/{name}")
-
+            
+# function to move files from download path to correposnding train, test or eval data path
 def movefiles(files, old_dir, new_dir):    
 
     new_dir = os.path.join(os.getcwd(), new_dir)
