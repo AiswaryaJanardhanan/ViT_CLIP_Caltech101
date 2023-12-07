@@ -3,7 +3,6 @@ import torch.optim as optim
 import torch
 import torch.optim as optim
 from torchvision.models import vit_b_16
-from torchvision.models import vit_b_32
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
@@ -20,23 +19,14 @@ with open(config_file, 'r') as stream:
 
 
 # Define the ViT-B-16 model
-def load_model(pretrained, layerid, NUM_CLASSES, model_name):
-    if model_name == 'vit_b_16':
-        if pretrained:
-            model = vit_b_16(weights='DEFAULT')
-        else:
-            model = vit_b_16(weights=None)
-    elif model_name == 'vit_b_32':
-        # Assuming a similar function for ViT-B-32 as ViT-B-16
-        if pretrained:
-            model = vit_b_32(weights='DEFAULT')  # Replace 'vit_b_32' with your actual function
-        else:
-            model = vit_b_32(weights=None)      # Replace 'vit_b_32' with your actual function
-    else:
-        raise ValueError(f"Unsupported model name: {model_name}")
-
-    model = layerFreezing(model, layerid, NUM_CLASSES, model_name, pretrained)
-    return model
+def load_model(pretrained,layerid,NUM_CLASSES, model_name):
+	if(model_name == 'vit_b_16'):
+		if pretrained:
+			model = vit_b_16(weights='DEFAULT')
+		else:
+			model = vit_b_16(weights=None)
+		model=layerFreezing(model,layerid,NUM_CLASSES, model_name, pretrained)
+		return model
 
 def layerFreezing(model,layerid,NUM_CLASSES, model_name='vit_b_16', pretrained=False):
 
@@ -86,14 +76,12 @@ def layerFreezing(model,layerid,NUM_CLASSES, model_name='vit_b_16', pretrained=F
 	elif model_name == 'facenet':
 		model.fc= nn.Linear(512, NUM_CLASSES)
   
-	elif model_name in ['vit_b_16', 'vit_b_32']:
+	elif model_name == 'vit_b_16':
 		model.head = nn.Sequential(
 							  nn.Linear(768, 512),
 							  nn.ReLU(),
 							  nn.Dropout(0.5),
 							  nn.Linear(512, NUM_CLASSES),)		
-
-                
 	return model
 
 # #Test Function
