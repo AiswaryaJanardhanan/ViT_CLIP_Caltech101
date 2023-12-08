@@ -1,0 +1,108 @@
+from pretrained
+Loading Caltech101 Dataset
+Files already downloaded and verified
+Image count with Background Class: 9207
+38
+Epoch 0/19
+----------
+train Loss: 1.9629 Acc: 0.5827
+eval Loss: 0.7751 Acc: 0.7909
+
+Epoch 1/19
+----------
+train Loss: 0.6199 Acc: 0.8391
+eval Loss: 0.3797 Acc: 0.8882
+
+Epoch 2/19
+----------
+train Loss: 0.3785 Acc: 0.8966
+eval Loss: 0.3130 Acc: 0.9038
+
+Epoch 3/19
+----------
+train Loss: 0.2573 Acc: 0.9258
+eval Loss: 0.2695 Acc: 0.9171
+
+Epoch 4/19
+----------
+train Loss: 0.2164 Acc: 0.9354
+eval Loss: 0.2650 Acc: 0.9267
+
+Epoch 5/19
+----------
+train Loss: 0.1473 Acc: 0.9568
+eval Loss: 0.2793 Acc: 0.9231
+
+Epoch 6/19
+----------
+train Loss: 0.1239 Acc: 0.9647
+eval Loss: 0.2389 Acc: 0.9363
+
+Epoch 7/19
+----------
+train Loss: 0.0765 Acc: 0.9777
+eval Loss: 0.1947 Acc: 0.9459
+
+Epoch 8/19
+----------
+train Loss: 0.0618 Acc: 0.9822
+eval Loss: 0.1941 Acc: 0.9423
+
+Epoch 9/19
+----------
+train Loss: 0.0602 Acc: 0.9810
+eval Loss: 0.2041 Acc: 0.9423
+
+Epoch 10/19
+----------
+train Loss: 0.0536 Acc: 0.9836
+eval Loss: 0.2005 Acc: 0.9423
+
+Epoch 11/19
+----------
+train Loss: 0.0528 Acc: 0.9832
+eval Loss: 0.1933 Acc: 0.9435
+
+Epoch 12/19
+----------
+train Loss: 0.0468 Acc: 0.9832
+eval Loss: 0.2040 Acc: 0.9411
+
+Epoch 13/19
+----------
+train Loss: 0.0456 Acc: 0.9845
+eval Loss: 0.1965 Acc: 0.9423
+
+Epoch 14/19
+----------
+train Loss: 0.0401 Acc: 0.9860
+eval Loss: 0.1953 Acc: 0.9411
+
+Epoch 15/19
+----------
+train Loss: 0.0432 Acc: 0.9840
+eval Loss: 0.1948 Acc: 0.9435
+
+Epoch 16/19
+----------
+train Loss: 0.0401 Acc: 0.9864
+eval Loss: 0.1935 Acc: 0.9447
+
+Epoch 17/19
+----------
+train Loss: 0.0458 Acc: 0.9847
+eval Loss: 0.1942 Acc: 0.9435
+
+Epoch 18/19
+----------
+train Loss: 0.0381 Acc: 0.9869
+eval Loss: 0.1961 Acc: 0.9435
+
+Epoch 19/19
+----------
+train Loss: 0.0441 Acc: 0.9847
+eval Loss: 0.1955 Acc: 0.9423
+
+Training complete in 66m 43s
+Best val Acc: 0.945913
+test Accuracy: 0.9432926829268292
