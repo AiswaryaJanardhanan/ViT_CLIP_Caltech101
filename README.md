@@ -29,8 +29,8 @@ train.py has the main training and test functions, path name for checkpoint and 
 ## root_dir has model folder where the checkpoints are saved
 
 ## References
-CLIP Zero shot:- https://github.com/openai/CLIP
-Caltech 101:- https://www.kaggle.com/datasets/huangruichu/caltech101
-background data preprocessing:- https://www.kaggle.com/code/dipuk0506/background-image-data
+CLIP Zero shot:- https://github.com/openai/CLIP   
+Caltech 101:- https://www.kaggle.com/datasets/huangruichu/caltech101   
+background data preprocessing:- https://www.kaggle.com/code/dipuk0506/background-image-data   
 Transfer learning with pretarined models :- https://github.com/dipuk0506/SpinalNet/blob/master/Transfer%20Learning/Transfer_Learning_STL10.py
 Tranining scripts :- https://www.kaggle.com/code/dipuk0506/caltech101-transformer-background/notebook
