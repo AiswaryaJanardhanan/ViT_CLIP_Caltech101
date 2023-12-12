@@ -36,8 +36,6 @@ test_set = data['test']
 cnt = 0
 total_cnt = len(test_set)
 for image_input, class_id in test_set:
-  # print(class_id)
-  # print(classes[class_id])  # # from PIL import Image
 
   # # # # Preprocess the image
   image_input = preprocess(image_input).unsqueeze(0).to(device)
@@ -55,10 +53,8 @@ for image_input, class_id in test_set:
   print(similarity)
   values, indices = similarity[0].topk(1)
 
-  # Print the result
   # print("\nTop predictions:\n")
   for value, index in zip(values, indices):
-      # print(f"{classes[index]:>16s}: {100 * value.item():.2f}%")
       if(index == class_id):
         cnt= cnt+1
         print('image_input',image_input)
